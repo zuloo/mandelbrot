@@ -98,7 +98,7 @@ def app(scr):
                     color = iters%10
 
                 # mbscr.addstr(y+fly, x+flx, char, curses.color_pair(color+1) | colormode[color])
-                if x+flx < dim[1]-1:
+                if x+flx < dim[1]-1 and y+fly < dim[0]:
                     scr.addstr(fly+y, x+flx, char, curses.color_pair(color+1) | colormode[color])
 
         # update
