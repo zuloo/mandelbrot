@@ -57,8 +57,8 @@ def app(scr):
 
     flx = int(math.floor(dim[1]/2))
     fly = int(math.floor(dim[0]/2))
-    clx = int(math.ceil(dim[1]/2))
-    cly = int(math.ceil(dim[0]/2))
+    clx = dim[1]-flx
+    cly = dim[0]-fly
     statscr=curses.newpad(1,dim[1])
     helpscr=curses.newpad(1,dim[1])
 
@@ -158,7 +158,7 @@ def app(scr):
         elif c == ord('?'): show_bars = not show_bars
         
         # dynaically adapt iterations
-        max_i=max(100,int(math.log(1.0/step,10)*80))
+        max_i=max(130,min(int(math.log(10.0/step,10)*500),500))
 
 if __name__ == "__main__":
     curses.wrapper(app)
