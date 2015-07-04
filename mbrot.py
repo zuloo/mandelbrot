@@ -68,13 +68,15 @@ def app(scr):
     
     # set the base parameters
     step = 1*factor*0.8
-    max_i = 100
+    max_i = 130
     cx = -1*factor
     cy = 0
 
     # set up stats pad
     show_bars = True
     y_range = y_off = None
+
+    auto_iter = True 
 
     while 1:
 
@@ -118,18 +120,25 @@ def app(scr):
             statscr.addstr(' {:0.5e} '.format(step/factor),c_stat)
             statscr.addstr('   Iterations',c_stat_div)
             statscr.addstr(' {} '.format(max_i),c_stat)
+            if auto_iter:
+                statscr.addstr('(auto)',c_stat_div)
             statscr.refresh(0,0,0,0,1,dim[1])
 
             helpscr.addstr(0,0,' Move', c_stat_div)
             helpscr.addstr(' h,j,k,l ', c_stat)
             helpscr.addstr('[',c_stat_div)
-            helpscr.addstr('Shift *10', c_stat)
-            helpscr.addstr('] ',c_stat_div)
-            helpscr.addstr('   Zoom', c_stat_div)
+            helpscr.addstr('Shift ', c_stat)
+            helpscr.addstr('*10] ',c_stat_div)
+            helpscr.addstr('| Zoom', c_stat_div)
             helpscr.addstr(' n,p ', c_stat)
-            helpscr.addstr('   Quit', c_stat_div)
+            helpscr.addstr('| Iter', c_stat_div)
+            helpscr.addstr(' N,P ', c_stat)
+            helpscr.addstr('[', c_stat_div)
+            helpscr.addstr('a ', c_stat)
+            helpscr.addstr('auto] ', c_stat_div)
+            helpscr.addstr('| Quit', c_stat_div)
             helpscr.addstr(' q ', c_stat)
-            helpscr.addstr('   Show/Hide', c_stat_div)
+            helpscr.addstr('| Info', c_stat_div)
             helpscr.addstr(' ?  ', c_stat)
             helpscr.addstr(0,dim[1]-19,' http://unix.porn ',c_stat_div)
             helpscr.refresh(0,0,dim[0]-1,0,dim[0],dim[1])
@@ -147,6 +156,13 @@ def app(scr):
         elif c == ord('q'): break
         elif c == ord('n'): step *= 0.8
         elif c == ord('p'): step *= 1.25
+        elif c == ord('N'): 
+            max_i += 10
+            auto_iter = False
+        elif c == ord('P'): 
+            max_i -= 10
+            auto_iter = False
+        elif c == ord('a'): auto_iter = not auto_iter
         elif c == ord('h'): cx -= step
         elif c == ord('l'): cx += step
         elif c == ord('k'): cy -= step
@@ -158,7 +174,8 @@ def app(scr):
         elif c == ord('?'): show_bars = not show_bars
         
         # dynaically adapt iterations
-        max_i=max(130,min(int(math.log(10.0/step,10)*500),500))
+        if auto_iter:
+            max_i=max(130,min(int(math.log(10.0/step,10)*500),500))
 
 if __name__ == "__main__":
     curses.wrapper(app)
