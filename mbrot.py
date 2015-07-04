@@ -175,7 +175,7 @@ def app(scr):
         
         # dynaically adapt iterations
         if auto_iter:
-            max_i=max(130,min(int(math.log(10.0/step,10)*500),500))
+            max_i=max(130,min(120+int(math.log(1.0/step,10)*100),500))
 
 if __name__ == "__main__":
     curses.wrapper(app)
