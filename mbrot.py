@@ -59,6 +59,10 @@ def app(scr):
     fly = int(math.floor(dim[0]/2))
     clx = int(math.ceil(dim[1]/2))
     cly = int(math.ceil(dim[0]/2))
+    statscr=curses.newpad(1,dim[1])
+    helpscr=curses.newpad(1,dim[1])
+
+
     # initial zoom factor (increases accuracy to some extent)
     factor = 100000
     
@@ -70,9 +74,6 @@ def app(scr):
 
     # set up stats pad
     show_bars = True
-    statscr=curses.newpad(1,dim[1])
-    helpscr=curses.newpad(1,dim[1])
-
     y_range = y_off = None
 
     while 1:
@@ -84,7 +85,7 @@ def app(scr):
         else:
             y_range = range(-fly,cly+1)
 
-        for x in range(-flx, clx):
+        for x in range(-flx, flx):
             for y in y_range:
 
                 iters = iterator(factor, cx+x*step/2, cy+y*step, 4000*factor*factor, max_i)
@@ -97,7 +98,8 @@ def app(scr):
                     color = iters%10
 
                 # mbscr.addstr(y+fly, x+flx, char, curses.color_pair(color+1) | colormode[color])
-                scr.addstr(fly+y, x+flx, char, curses.color_pair(color+1) | colormode[color])
+                if x+flx < dim[1]-1:
+                    scr.addstr(fly+y, x+flx, char, curses.color_pair(color+1) | colormode[color])
 
         # update
         scr.refresh()
@@ -134,7 +136,15 @@ def app(scr):
 
         # navigation key bindings
         c= scr.getch()
-        if c == ord('q'): break
+        if c == curses.KEY_RESIZE:
+            dim = scr.getmaxyx()
+            flx = int(math.floor(dim[1]/2))
+            fly = int(math.floor(dim[0]/2))
+            clx = int(math.ceil(dim[1]/2))
+            cly = int(math.ceil(dim[0]/2))
+            statscr=curses.newpad(1,dim[1])
+            helpscr=curses.newpad(1,dim[1])
+        elif c == ord('q'): break
         elif c == ord('n'): step *= 0.8
         elif c == ord('p'): step *= 1.25
         elif c == ord('h'): cx -= step
@@ -146,10 +156,9 @@ def app(scr):
         elif c == ord('K'): cy -= step*10
         elif c == ord('J'): cy += step*10
         elif c == ord('?'): show_bars = not show_bars
-
-
+        
         # dynaically adapt iterations
-        max_i=max(100,int(math.log(1.0/step,10)*50))
+        max_i=max(100,int(math.log(1.0/step,10)*80))
 
 if __name__ == "__main__":
     curses.wrapper(app)
