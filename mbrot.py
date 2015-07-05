@@ -77,6 +77,8 @@ def app(scr):
     y_range = y_off = None
 
     auto_iter = True 
+    cross_hair = 1
+    cross_mode = curses.A_UNDERLINE
 
     while 1:
 
@@ -100,8 +102,12 @@ def app(scr):
                     color = iters%10
 
                 # mbscr.addstr(y+fly, x+flx, char, curses.color_pair(color+1) | colormode[color])
+                if (x == 0 and 0 < abs(y) < 4) or (y == 0 and 1 < abs(x) < 8):
+                    attr = cross_mode 
+                else:
+                    attr = curses.A_NORMAL
                 if x+flx < dim[1]-1 and y+fly < dim[0]:
-                    scr.addstr(fly+y, x+flx, char, curses.color_pair(color+1) | colormode[color])
+                    scr.addstr(fly+y, x+flx, char, curses.color_pair(color+1) | colormode[color] | attr)
 
         # update
         scr.refresh()
@@ -124,23 +130,26 @@ def app(scr):
                 statscr.addstr('(auto)',c_stat_div)
             statscr.refresh(0,0,0,0,1,dim[1])
 
-            helpscr.addstr(0,0,' Move', c_stat_div)
+            helpscr.addstr(0,0,' Mv', c_stat_div)
             helpscr.addstr(' h,j,k,l ', c_stat)
             helpscr.addstr('[',c_stat_div)
-            helpscr.addstr('Shift ', c_stat)
+            helpscr.addstr('Shift', c_stat)
             helpscr.addstr('*10] ',c_stat_div)
-            helpscr.addstr('| Zoom', c_stat_div)
+            helpscr.addstr('| +/-', c_stat_div)
             helpscr.addstr(' n,p ', c_stat)
-            helpscr.addstr('| Iter', c_stat_div)
+            helpscr.addstr('| Itr', c_stat_div)
             helpscr.addstr(' N,P ', c_stat)
             helpscr.addstr('[', c_stat_div)
-            helpscr.addstr('a ', c_stat)
-            helpscr.addstr('auto] ', c_stat_div)
-            helpscr.addstr('| Quit', c_stat_div)
-            helpscr.addstr(' q ', c_stat)
-            helpscr.addstr('| Info', c_stat_div)
+            helpscr.addstr('a', c_stat)
+            helpscr.addstr('uto] ', c_stat_div)
+            helpscr.addstr('| ', c_stat_div)
+            helpscr.addstr('c', c_stat)
+            helpscr.addstr('ross | ', c_stat_div)
+            helpscr.addstr('q', c_stat)
+            helpscr.addstr('uit | Info', c_stat_div)
             helpscr.addstr(' ?  ', c_stat)
-            helpscr.addstr(0,dim[1]-19,' http://unix.porn ',c_stat_div)
+            if dim[1] > 96:
+                helpscr.addstr(0,dim[1]-19,' http://unix.porn ',c_stat_div)
             helpscr.refresh(0,0,dim[0]-1,0,dim[0],dim[1])
 
         # navigation key bindings
@@ -172,7 +181,17 @@ def app(scr):
         elif c == ord('K'): cy -= step*10
         elif c == ord('J'): cy += step*10
         elif c == ord('?'): show_bars = not show_bars
-        
+        elif c == ord('c'): 
+            cross_hair = (cross_hair+1)%4
+            if cross_hair == 1:
+                cross_mode = curses.A_UNDERLINE
+            elif cross_hair == 2:
+                cross_mode = curses.A_REVERSE
+            elif cross_hair == 3:
+                cross_mode = curses.A_DIM
+            else:
+                cross_mode = curses.A_NORMAL
+
         # dynaically adapt iterations
         if auto_iter:
             max_i=max(130,min(120+int(math.log(1.0/step,10)*100),500))
